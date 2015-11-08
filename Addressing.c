@@ -19,7 +19,7 @@ int main()
     char label[10],mnemonic[10],operand[10],program_name[10];
     int address=0,first_address=0,previous_address=0,last_address=0,line=0;
 
-    /*Adressing*/
+    /*Adressing in decimal format*/
 
     fpr=fopen("input.txt","r");
     fpw=fopen("addressed_file.txt","w");
