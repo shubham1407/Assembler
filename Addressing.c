@@ -19,14 +19,14 @@ int main()
     char label[10],mnemonic[10],operand[10],program_name[10];
     int address=0,first_address=0,previous_address=0,last_address=0,line=0;
 
-    /*Adressing in decimal format*/
+    /*Adressing*/
 
     fpr=fopen("input.txt","r");
     fpw=fopen("addressed_file.txt","w");
 
     fscanf(fpr,"%s%s%d",&program_name,&mnemonic,&address);
-    fprintf(fpw,"\t%s\t%s\t%d\n",program_name,mnemonic,address);
     line++;
+    fprintf(fpw,"%d\t\t%s\t%s\t%d\n",line,program_name,mnemonic,address);
 
     printf("\n%d\n",address);
 
@@ -39,7 +39,7 @@ int main()
 
             if(line>=2)
             {
-                fprintf(fpw,"%.4d\t%s\t%s\t%s\n",address,label,mnemonic,operand);
+                fprintf(fpw,"%d\t%.4d\t%s\t%s\t%s\n",line,address,label,mnemonic,operand);
                 address+=3;
             }
         }
