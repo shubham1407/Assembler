@@ -6,45 +6,76 @@ FILE *fpr=NULL,*fpw=NULL;
 
 int main()
 {
-    char label[10],mnemonic[10],operand[10],program_name[10];
-    int address=0,first_address=0,previous_address=0,last_address=0,line=0,c=0,p1=0,p2=0,i=0,length,x=0;
+    char label[10],mnemonic[10],operand[10],program_name[10],char_address[10],char_lh[10],char_rh[10];
+    int address=0,first_address=0,last_address=0,line=0,length,x=0,right_half=0,left_half=0,temp=0,l=0;
 
     /*Adressing*/
 
     fpr=fopen("new_input.txt","r");
     fpw=fopen("addressed_file.txt","w");
 
-    fscanf(fpr,"%s%s%d",&program_name,&mnemonic,&address);
+    fscanf(fpr,"%s%s%d",&program_name,&mnemonic,&address);  /*Reading data from input.txt*/
     line++;
-    fprintf(fpw,"%d\t\t%s\t%s\t%d\n",line,program_name,mnemonic,address);
+    fprintf(fpw,"%d\t\t%s\t%s\t%d\n",line,program_name,mnemonic,address);  /*Writing data into addressed_file.txt */
 
     while(strcmp(mnemonic,"END")!=0)
     {
-        if(strcmp(label,".")!=0)     //For checking comments
+        if(strcmp(label,".")!=0)        /*For checking comments*/
         {
             fscanf(fpr,"%s%s%s",&label,&mnemonic,&operand);
             line++;
 
             if(line>=2)
             {
-                fprintf(fpw,"%d\t%.4d\t%s\t%s\t%s\n",line,address,label,mnemonic,operand);
+                /*Addressing in hexadecimal format */
+
+                temp=address;
+
+                right_half=temp%100;    /*contains right half of the address */
+                temp/=100;
+                left_half=temp;       /*contains left half of the address */
+
+                itoa(left_half,char_lh,10);    /*converts integer into string */
+                itoa(right_half,char_rh,16);    /*converts integer into hexadecimal */
+
+                strcat(char_lh,char_rh);
+
+                l=strlen(char_lh);
+
+                if(l<=3)
+                {
+                    char_lh[4]='\0';
+                    char_lh[3]=char_lh[2];
+                    char_lh[2]='0';
+                }
+
+                /*printf("\n%s",char_lh);*/
+
+
+
+                /*Writing data into addressed_file.txt */
+
+                fprintf(fpw,"%d\t%s\t%s\t%s\t%s\n",line,char_lh,label,mnemonic,operand);
+
+
+
+                /*checking conditions for various mnemonics*/
 
                 if(strcmp(mnemonic,"SIZE")==0)
                 {
                     length=0;
                     length=strlen(operand);
 
-                    length-=3; /*excluding C'' ,X'' */
-                        if(operand[0]=='C')
-                       {
+                    length-=3;          /*excluding C'' ,X'' */
+
+                    if(operand[0]=='C')
                            address+=length;
-                       }
-                       else
-                       {
-                           length=(length/2);
-                           address+=length;
-                       }
-                   
+                    else
+                    {
+                        length=(length/2);
+                        address+=length;
+                    }
+
                 }
                 else if(strcmp(mnemonic,"WORD")==0)
                 {
@@ -52,12 +83,12 @@ int main()
                 }
                 else if(strcmp(mnemonic,"RESERW")==0)
                 {
-                    x=atoi(operand); /*converting character into integer */
-                    address+=(x*3); /*1 WORD = 3 BYTES */
+                    x=atoi(operand);    /*converting character into integer */
+                    address+=(x*3);     /*1 WORD = 3 BYTES */
                 }
                 else if(strcmp(mnemonic,"RESERB")==0)
                 {
-                    x=atoi(operand); /*change RESB's mnemonic into hexadecimal --> x, address+=x; */
+                    x=atoi(operand);    /*change RESB's mnemonic into hexadecimal --> x, address+=x; */
                     address+=x;
                 }
                 else
@@ -75,4 +106,3 @@ int main()
 
     return 0;
 }
-
