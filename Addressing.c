@@ -11,7 +11,7 @@ int main()
 
     /*Adressing*/
 
-    fpr=fopen("input.txt","r");
+    fpr=fopen("new_input.txt","r");
     fpw=fopen("addressed_file.txt","w");
 
     fscanf(fpr,"%s%s%d",&program_name,&mnemonic,&address);
@@ -20,7 +20,7 @@ int main()
 
     while(strcmp(mnemonic,"END")!=0)
     {
-        if(strcmp(label,".")!=0)
+        if(strcmp(label,".")!=0)     //For checking comments
         {
             fscanf(fpr,"%s%s%s",&label,&mnemonic,&operand);
             line++;
@@ -29,25 +29,33 @@ int main()
             {
                 fprintf(fpw,"%d\t%.4d\t%s\t%s\t%s\n",line,address,label,mnemonic,operand);
 
-                if(strcmp(mnemonic,"BYTE")==0)
+                if(strcmp(mnemonic,"SIZE")==0)
                 {
                     length=0;
                     length=strlen(operand);
 
-                    length-=3; /*excluding C'' */
-
-                    address+=length;
+                    length-=3; /*excluding C'' ,X'' */
+                        if(operand[0]=='C')
+                       {
+                           address+=length;
+                       }
+                       else
+                       {
+                           length=(length/2);
+                           address+=length;
+                       }
+                   
                 }
                 else if(strcmp(mnemonic,"WORD")==0)
                 {
                     address+=3;
                 }
-                else if(strcmp(mnemonic,"RESW")==0)
+                else if(strcmp(mnemonic,"RESERW")==0)
                 {
                     x=atoi(operand); /*converting character into integer */
                     address+=(x*3); /*1 WORD = 3 BYTES */
                 }
-                else if(strcmp(mnemonic,"RESB")==0)
+                else if(strcmp(mnemonic,"RESERB")==0)
                 {
                     x=atoi(operand); /*change RESB's mnemonic into hexadecimal --> x, address+=x; */
                     address+=x;
