@@ -25,24 +25,38 @@ int main()
             fscanf(fpr,"%s%s%s",&label,&mnemonic,&operand);
             line++;
 
-            if(line>=2)
-            {
-                /*Addressing in hexadecimal format */
+             /*Addressing in hexadecimal format */
 
                 temp=address;
-
+                
+                if(address<100)
+                {
+                    right_half=address;
+                    left_half=0;
+                }
+               else if(address>=100)
+               {
                 right_half=temp%100;    /*contains right half of the address */
                 temp/=100;
-                left_half=temp;       /*contains left half of the address */
+                left_half=temp;         /*contains left half of the address */
+               }
 
                 itoa(left_half,char_lh,10);    /*converts integer into string */
                 itoa(right_half,char_rh,16);    /*converts integer into hexadecimal */
-
+                   
+                 l=strlen(char_lh);
+                 
+                 if(l==1)
+                 {
+                    char_lh[2]='\0';
+                    char_lh[1]=char_lh[0];
+                    char_lh[0]='0';
+                 }
                 strcat(char_lh,char_rh);
 
                 l=strlen(char_lh);
 
-                if(l<=3)
+                if(l==3)
                 {
                     char_lh[4]='\0';
                     char_lh[3]=char_lh[2];
@@ -94,7 +108,7 @@ int main()
                 else
                     address+=3;
             }
-        }
+        
         else
         {
             fprintf(fpw,"\n");
