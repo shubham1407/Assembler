@@ -6,7 +6,7 @@ FILE *fpr=NULL,*fpw=NULL;
 
 int main()
 {
-    char label[10],mnemonic[10],operand[10],program_name[10],char_lh[10],char_rh[10],char_address[10],first_address[10],last_address[10];
+    char label[10],mnemonic[10],operand[10],program_name[10],char_lh[10],char_rh[10],char_address[10],first_address[10],last_address[10],t[10];
     int address=0,line=0,length,x=0,right_half=0,left_half=0,temp=0,l=0,i=0;
 
 
@@ -100,7 +100,10 @@ int main()
             }
             else if(strcmp(mnemonic,"RESERB")==0)
             {
-                x=atoi(operand);    /*change RESERB's mnemonic into hexadecimal --> x, address+=x; */
+                x=atoi(operand);    /*change RESERB's string mnemonic into integer --> x */
+                itoa(x,t,16);       /*now, change this integer from base 10 to base 16(i.e. hexadecimal) as a string --> t */
+                x=atoi(t);          /*finally, change the above hexadecimal string into an integer of base 10(i.e. decimal) */
+
                 address+=x;
             }
             else
