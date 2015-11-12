@@ -1,5 +1,3 @@
-# Assembler
-Project
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -13,7 +11,7 @@ int main()
 
     /*Adressing*/
 
-    fpr=fopen("input.txt","r");
+    fpr=fopen("new_input.txt","r");
     fpw=fopen("addressed_file.txt","w");
 
     fscanf(fpr,"%s%s%X",&program_name,&mnemonic,&address);  /*Reading data from input.txt*/
@@ -73,6 +71,29 @@ int main()
 
     fclose(fpr);
     fclose(fpw);
-    
+
+    /*Creating Symtab*/
+
+    fpr=fopen("addressed_file.txt","r");
+    fpw=fopen("symtab.txt","w");
+
+    fscanf(fpr,"%d%s%s%s",&line,&program_name,&mnemonic,&operand);
+
+    while(strcmp(mnemonic,"END")!=0)
+    {
+        fscanf(fpr,"%d%X%s%s%s",&line,&address,&label,&mnemonic,&operand);
+
+        if(line==2)
+            first_address=address;     /*Will be used during object file creation */
+
+        if(strcmp(label,"--")!=0)
+            fprintf(fpw,"%s  %X\n",label,address);
+    }
+
+    last_address=address;      /*Will be used during object file creation */
+
+    fclose(fpr);
+    fclose(fpw);
+
     return 0;
 }
