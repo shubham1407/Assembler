@@ -331,5 +331,56 @@ int main()
     }
     fclose(fpr);
 
+    /*Creating loader.txt*/
+
+    j=l1=c=0;
+    fpw=fopen("loader.txt","w");
+    fprintf(fpw,"0000\txxxxxxxx\txxxxxxxx\txxxxxxxx\txxxxxxxx\n");
+    for(i=0;i<k;i++)
+    {
+        if(strcmp(opcodes[i],"++")!=0)
+            fprintf(fpw,"%s",opcodes[i]);
+        else
+        {
+            l1=0;
+            for(j=0;j<3;j++)
+                fprintf(fpw,"\n  .  \t    .    \t    .    \t    .    \t    .    \t\n");
+            c++;
+            i++;
+
+            if(c==2)
+            {
+                first_address-=16;
+                first_address+=4096;
+                fprintf(fpw,"%.4X\t",first_address);
+                first_address+=16;
+            }
+            else
+            {
+                fprintf(fpw,"%.4X\t",first_address);
+                first_address+=16;
+            }
+
+            for(j=0;j<atoi(opcodes[i]);j++)
+            {
+                l1+=2;
+                fprintf(fpw,"xx");
+
+                if(l1%8==0)
+                    fprintf(fpw,"\t");
+            }
+            continue;
+        }
+
+        l1+=strlen(opcodes[i]);
+
+        if(l1%8==0)
+            fprintf(fpw,"\t");
+        if(l1%32==0)
+            {fprintf(fpw,"\n%.4X\t",first_address);first_address+=16;}
+    }
+
+    fclose(fpw);
+
     return 0;
 }
