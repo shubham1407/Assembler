@@ -2,16 +2,22 @@
 #include<stdlib.h>
 #include<string.h>
 
-FILE *fpr=NULL,*fpw=NULL;
+FILE *fpr=NULL,*fpw=NULL,*fp1=NULL,*fp2=NULL;
 
 int main()
 {
-    char label[10],mnemonic[10],operand[10],program_name[10];
-    int address=0,line=0,length,x=0,first_address=0,last_address=0;
+    char label[10],mnemonic[10] ,operand[10],program_name[10],sym_label[10][10],sym_address[10][10];
+    int address=0,line=0,length,x=0,first_address=0,last_address=0,object_code=0,i=0,j=0,k=0;
+
+    char op_mnemonic[26][10]={"LDAC","STAC","SUBJ","MULT","STRL","DIVD","ADDA","STRCH","DT",
+    "JMPEQ","LOADCH","DW","SUBR","FIXR","FIX","JMPLT","COMP","CLR","LOADB","J","DR","COMPR","STREX","LOADT","LOADL","LOADX"};
+
+    char op_opcode[26][10]={"10","1C","58","30","24","34","28","44","F0","40","60","EC",
+    "4C","C8","3C","39","38","C4","78","3C","E8","D0","20","84","08","04"};
 
     /*Adressing*/
 
-    fpr=fopen("input.txt","r");
+    fpr=fopen("new_input.txt","r");
     fpw=fopen("addressed_file.txt","w");
 
     fscanf(fpr,"%s%s%X",&program_name,&mnemonic,&address);  /*Reading data from input.txt*/
@@ -87,13 +93,28 @@ int main()
             first_address=address;     /*Will be used during object file creation */
 
         if(strcmp(label,"--")!=0)
+        {
             fprintf(fpw,"%s  %X\n",label,address);
+            j++;
+        }
     }
 
     last_address=address;      /*Will be used during object file creation */
 
     fclose(fpr);
     fclose(fpw);
+
+    /*Extracting data from symtab*/
+
+    fp1=fopen("symtab.txt","r");
+
+    while(j--)
+    {
+        fscanf(fp1,"%s%s",&sym_label[i],&sym_address[i]);
+        i++;
+    }
+
+    fclose(fp1);
 
     return 0;
 }
