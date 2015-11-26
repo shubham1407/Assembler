@@ -32,7 +32,7 @@ char addr(char ch)
 
 int main()
 {
-    char label[10],mnemonic[10] ,operand[10],program_name[10],sym_label[20][10],sym_address[20][10],opcode[10],str[10],ch,c;
+    char label[10],mnemonic[10] ,operand[10],program_name[10],sym_label[30][10],sym_address[30][10],opcode[10],str[10],st[10],ch,c;
     int address=0,line=0,length,x=0,first_address=0,last_address=0,obj_code=0,i=0,j=0,k=0,pos1=0,pos2=0,flag1=0,flag2=0,p1=0,p2=0,l=0,z=0,n=0;
 
     char op_mnemonic[26][10]={"LDAC","STAC","SUBJ","MULT","STRL","DIVD","ADDA","STRCH","DT",
@@ -122,7 +122,6 @@ int main()
         {
             fprintf(fpw,"%s  %X\n",label,address);
             j++;
-            z=j;
         }
     }
 
@@ -144,6 +143,9 @@ int main()
 
     fclose(fp1);
 
+    /*for(j=0;j<i;j++)
+        printf("\n%s\t%s",sym_label[j],sym_address[j]);*/
+
     /*Generating opcodes*/
 
     fpr=fopen("addressed_file.txt","r");
@@ -155,6 +157,7 @@ int main()
     while(strcmp(mnemonic,"END")!=0)
     {
         fscanf(fpr,"%d%X%s%s%s",&line,&address,&label,&mnemonic,&operand);
+        l=strlen(operand);
 
         if(strcmp(mnemonic,"WORD")==0)
             fprintf(fpw,"%d\t%.4X\t%s\t%s\t%s\t\t%.6X\n",line,address,label,mnemonic,operand,atoi(operand));
@@ -181,10 +184,30 @@ int main()
         else if(strcmp(mnemonic,"SUBR")==0)
             fprintf(fpw,"%d\t%.4X\t%s\t%s\t%s\t\t4C0000\n",line,address,label,mnemonic,operand);
 
+        else if(operand[l-1]=='X' && operand[l-2]==',')
+        {
+            strcpy(st,operand);
+            st[l-2]='\0';
+
+            for(j=0;j<17;j++)
+            {
+                if(strcmp(st,sym_label[j])==0)
+                {
+                    pos2=j;
+                    break;
+                }
+            }
+
+            strcpy(str,sym_address[pos2]);
+            ch=str[0];
+            str[0]=addr(ch);printf("\n%s",str);
+
+            fprintf(fpw,"%d\t%.4X\t%s\t%s\t%s\t%s%s\n",line,address,label,mnemonic,operand,op_opcode[pos1],str);
+        }
+
         else
         {
             pos1=pos2=0;
-
             for(i=0;i<26;i++)
             {
                 if(strcmp(mnemonic,op_mnemonic[i])==0)
@@ -193,34 +216,15 @@ int main()
                     break;
                 }
             }
-
-            for(j=0;j<z;j++)
+            for(j=0;j<17;j++)
             {
                 if(strcmp(operand,sym_label[j])==0)
                 {
                     pos2=j;
                     break;
                 }
-                if(strcmp(sym_label[j],"BUFFER")==0)
-                    z=j;
-
-                if(strcmp(operand,"BUFFER,X")==0)
-                {
-                    pos2=z;
-                    break;
-                }
             }
-
-            if(strcmp(operand,"BUFFER,X")==0)
-            {
-                strcpy(str,sym_address[pos2]);
-                ch=str[0];
-                str[0]=addr(ch);
-
-                fprintf(fpw,"%d\t%.4X\t%s\t%s\t%s\t%s%s\n",line,address,label,mnemonic,operand,op_opcode[pos1],str);
-            }
-            else
-                fprintf(fpw,"%d\t%.4X\t%s\t%s\t%s\t\t%s%s\n",line,address,label,mnemonic,operand,op_opcode[pos1],sym_address[pos2]);
+            fprintf(fpw,"%d\t%.4X\t%s\t%s\t%s\t\t%s%s\n",line,address,label,mnemonic,operand,op_opcode[pos1],sym_address[pos2]);
         }
     }
 
