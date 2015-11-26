@@ -32,8 +32,10 @@ char addr(char ch)
 
 int main()
 {
-    char label[10],mnemonic[10] ,operand[10],program_name[10],sym_label[30][10],sym_address[30][10],opcode[10],str[10],st[10],ch,c;
-    int address=0,line=0,length,x=0,first_address=0,last_address=0,obj_code=0,i=0,j=0,k=0,pos1=0,pos2=0,flag1=0,flag2=0,p1=0,p2=0,l=0,z=0,n=0;
+    char label[10],mnemonic[10] ,operand[10],program_name[10],sym_label[30][10],sym_address[30][10],
+    opcodes[30][10],opcode[10],str[80],st[10],ch,c,chr[10],yo[80][80];
+    int address=0,line=0,length,x=0,first_address=0,last_address=0,obj_code=0,i=0,j=0,k=0,pos1=0,
+    pos2=0,flag1=0,flag2=0,p1=0,p2=0,l=0,z=0,n=0,count=0,l1=0,l2=0;
 
     char op_mnemonic[26][10]={"LDAC","STAC","SUBJ","MULT","STRL","DIVD","ADDA","STRCH","DT",
     "JMPEQ","LOADCH","DW","SUBR","FIXR","FIX","JMPLT","COMP","CLR","LOADB","J","DR","COMPR","STREX","LOADT","LOADL","LOADX"};
@@ -143,9 +145,6 @@ int main()
 
     fclose(fp1);
 
-    /*for(j=0;j<i;j++)
-        printf("\n%s\t%s",sym_label[j],sym_address[j]);*/
-
     /*Generating opcodes*/
 
     fpr=fopen("addressed_file.txt","r");
@@ -200,7 +199,7 @@ int main()
 
             strcpy(str,sym_address[pos2]);
             ch=str[0];
-            str[0]=addr(ch);printf("\n%s",str);
+            str[0]=addr(ch);
 
             fprintf(fpw,"%d\t%.4X\t%s\t%s\t%s\t%s%s\n",line,address,label,mnemonic,operand,op_opcode[pos1],str);
         }
@@ -230,6 +229,80 @@ int main()
 
     fclose(fpr);
     fclose(fpw);
+
+    /*Generating Object File*/
+
+    fpr=fopen("intermediate.txt","r");
+
+
+    fscanf(fpr,"%d%s%s%s%s",&line,&program_name,&mnemonic,&operand,&opcode);
+    k=count=0;
+
+    while(strcmp(mnemonic,"END")!=0)
+    {
+        fscanf(fpr,"%d%X%s%s%s%s",&line,&address,&label,&mnemonic,&operand,&opcode);
+        if(strcmp(opcode,"--")!=0)
+        {
+            l1=strlen(opcode)/2;
+            count+=l1;
+            strcpy(opcodes[k],opcode);
+            k++;
+        }
+    }
+    fclose(fpr);
+
+    fpr=fopen("intermediate.txt","r");
+    fscanf(fpr,"%d%s%s%s%s",&line,&program_name,&mnemonic,&operand,&opcode);
+    k=count=0;
+    fpw=fopen("object_file.txt","w");
+
+    chr[0]='^';
+    chr[1]=' ';
+    chr[2]='\0';
+    i=k=0;
+
+    fprintf(fpw,"H ^ %s ^ %.6X ^ %.6X\n\n",program_name,first_address,last_address-first_address);
+
+    while(strcmp(mnemonic,"END")!=0)
+    {
+        fscanf(fpr,"%d%X%s%s%s%s",&line,&address,&label,&mnemonic,&operand,&opcode);
+
+        if(i<30 && strcmp(opcode,"--")!=0)
+        {
+            if(i==28 || i==29)
+            {
+                fprintf(fpw,"T ^ %.6X ^ %.2X %s\n\n",address-i,i,yo[k]);
+                k++;
+                i=0;
+                strcat(yo[k],chr);
+                i+=(strlen(opcode))/2;
+                strcat(yo[k],opcode);
+            }
+            else
+            {
+                strcat(yo[k],chr);
+                i+=(strlen(opcode))/2;
+                strcat(yo[k],opcode);
+            }
+        }
+        if(i>=30 || strcmp(opcode,"--")==0)
+        {
+            if(strlen(yo[k])!=0)
+            {
+                if(i<30)
+                    fprintf(fpw,"T ^ %.6X ^ %.2X %s\n\n",address-i,i,yo[k]);
+                else
+                    fprintf(fpw,"T ^ %.6X ^ %.2X %s\n\n",address-i+3,i,yo[k]);
+            }
+            k++;
+            i=0;
+        }
+    }
+
+    fprintf(fpw,"E ^ %.6X",first_address);
+
+    fclose(fpw);
+    fclose(fpr);
 
     return 0;
 }
