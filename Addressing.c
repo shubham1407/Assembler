@@ -4,10 +4,36 @@
 
 FILE *fpr=NULL,*fpw=NULL,*fp1=NULL,*fp2=NULL;
 
+char addr(char ch)
+{
+    int n;
+
+    n=0;
+    n=ch-'0';
+    n+=8;
+
+    if(n==8)
+        return '8';
+    else if(n==9)
+        return '9';
+    else if(n==10)
+        return 'A';
+    else if(n==11)
+        return 'B';
+    else if(n==12)
+        return 'C';
+    else if(n==13)
+        return 'D';
+    else if(n==14)
+        return 'E';
+    else if(n==15)
+        return 'F';
+}
+
 int main()
 {
-    char label[10],mnemonic[10] ,operand[10],program_name[10],sym_label[20][10],sym_address[20][10],opcode[10];
-    int address=0,line=0,length,x=0,first_address=0,last_address=0,i=0,j=0,k=0,pos1=0,pos2=0,flag1=0,flag2=0,p1=0,p2=0,l=0,z=0;
+    char label[10],mnemonic[10] ,operand[10],program_name[10],sym_label[20][10],sym_address[20][10],opcode[10],str[10],ch,c;
+    int address=0,line=0,length,x=0,first_address=0,last_address=0,obj_code=0,i=0,j=0,k=0,pos1=0,pos2=0,flag1=0,flag2=0,p1=0,p2=0,l=0,z=0,n=0;
 
     char op_mnemonic[26][10]={"LDAC","STAC","SUBJ","MULT","STRL","DIVD","ADDA","STRCH","DT",
     "JMPEQ","LOADCH","DW","SUBR","FIXR","FIX","JMPLT","COMP","CLR","LOADB","J","DR","COMPR","STREX","LOADT","LOADL","LOADX"};
@@ -187,7 +213,11 @@ int main()
 
             if(strcmp(operand,"BUFFER,X")==0)
             {
-                fprintf(fpw,"%d\t%.4X\t%s\t%s\t%s\t%s%s\n",line,address,label,mnemonic,operand,op_opcode[pos1],sym_address[pos2]);
+                strcpy(str,sym_address[pos2]);
+                ch=str[0];
+                str[0]=addr(ch);
+
+                fprintf(fpw,"%d\t%.4X\t%s\t%s\t%s\t%s%s\n",line,address,label,mnemonic,operand,op_opcode[pos1],str);
             }
             else
                 fprintf(fpw,"%d\t%.4X\t%s\t%s\t%s\t\t%s%s\n",line,address,label,mnemonic,operand,op_opcode[pos1],sym_address[pos2]);
