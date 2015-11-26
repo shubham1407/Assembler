@@ -33,7 +33,8 @@ char addr(char ch)
 int main()
 {
     char label[10],mnemonic[10] ,operand[10],program_name[10],sym_label[30][10],sym_address[30][10],
-    opcodes[1000][3],opcode[10],str[80],st[10],ch,c,chr[10],yo[80][80],td_ops[100][33],addresses[100][4];
+    opcodes[1000][3],opcode[10],str[80],st[10],ch,c,chr[10],text[80][80];
+
     int address=0,line=0,length,x=0,first_address=0,last_address=0,pa=0,obj_code=0,i=0,j=0,k=0,pos1=0,
     pos2=0,flag1=0,flag2=0,p1=0,p2=0,l=0,z=0,n=0,count=0,l1=0,l2=0;
 
@@ -59,9 +60,7 @@ int main()
             fscanf(fpr,"%s%s%s",&label,&mnemonic,&operand);
             line++;
 
-            /*Writing data into addressed_file.txt */
-
-            fprintf(fpw,"%d\t%.4X\t%s\t%s\t%s\n",line,address,label,mnemonic,operand);
+            fprintf(fpw,"%d\t%.4X\t%s\t%s\t%s\n",line,address,label,mnemonic,operand);  /*Writing data into addressed_file.txt */
 
             /*checking conditions for various mnemonics*/
 
@@ -69,7 +68,6 @@ int main()
             {
                 length=0;
                 length=strlen(operand);
-
                 length-=3;          /*excluding C'' ,X'' */
 
                 if(operand[0]=='C')
@@ -81,9 +79,7 @@ int main()
                 }
             }
             else if(strcmp(mnemonic,"WORD")==0)
-            {
                 address+=3;
-            }
             else if(strcmp(mnemonic,"RESERW")==0)
             {
                 x=atoi(operand);    /*converting character into integer */
@@ -98,11 +94,8 @@ int main()
                 address+=3;
         }
         else
-        {
             fprintf(fpw,"\n");
-        }
     }
-
     fclose(fpr);
     fclose(fpw);
 
@@ -126,7 +119,6 @@ int main()
             j++;
         }
     }
-
     last_address=address;      /*Will be used during object file creation */
 
     fclose(fpr);
@@ -252,34 +244,33 @@ int main()
         {
             if(i==28 || i==29)
             {
-                fprintf(fpw,"T ^ %.6X ^ %.2X %s\n\n",address-i,i,yo[k]);
+                fprintf(fpw,"T ^ %.6X ^ %.2X %s\n\n",address-i,i,text[k]);
                 k++;
                 i=0;
-                strcat(yo[k],chr);
+                strcat(text[k],chr);
                 i+=(strlen(opcode))/2;
-                strcat(yo[k],opcode);
+                strcat(text[k],opcode);
             }
             else
             {
-                strcat(yo[k],chr);
+                strcat(text[k],chr);
                 i+=(strlen(opcode))/2;
-                strcat(yo[k],opcode);
+                strcat(text[k],opcode);
             }
         }
         if(i>=30 || strcmp(opcode,"--")==0)
         {
-            if(strlen(yo[k])!=0)
+            if(strlen(text[k])!=0)
             {
                 if(i<30)
-                    fprintf(fpw,"T ^ %.6X ^ %.2X %s\n\n",address-i,i,yo[k]);
+                    fprintf(fpw,"T ^ %.6X ^ %.2X %s\n\n",address-i,i,text[k]);
                 else
-                    fprintf(fpw,"T ^ %.6X ^ %.2X %s\n\n",address-i+3,i,yo[k]);
+                    fprintf(fpw,"T ^ %.6X ^ %.2X %s\n\n",address-i+3,i,text[k]);
             }
             k++;
             i=0;
         }
     }
-
     fprintf(fpw,"E ^ %.6X",first_address);
 
     fclose(fpw);
@@ -319,9 +310,7 @@ int main()
             }
         }
         if(strcmp(opcode,"--")==0)
-        {
-            /*fscanf(fpr,"%d%X%s%s%s%s",&line,&address,&label,&mnemonic,&operand,&opcode);*/
-        }
+        {}
         if(strcmp(opcode,"--")!=0 && strlen(opcode)==2)
         {
             strcpy(opcodes[k],opcode);
@@ -371,15 +360,12 @@ int main()
             }
             continue;
         }
-
         l1+=strlen(opcodes[i]);
-
         if(l1%8==0)
             fprintf(fpw,"\t");
         if(l1%32==0)
             {fprintf(fpw,"\n%.4X\t",first_address);first_address+=16;}
     }
-
     fclose(fpw);
 
     return 0;
