@@ -33,8 +33,8 @@ char addr(char ch)
 int main()
 {
     char label[10],mnemonic[10] ,operand[10],program_name[10],sym_label[30][10],sym_address[30][10],
-    opcodes[30][10],opcode[10],str[80],st[10],ch,c,chr[10],yo[80][80];
-    int address=0,line=0,length,x=0,first_address=0,last_address=0,obj_code=0,i=0,j=0,k=0,pos1=0,
+    opcodes[1000][3],opcode[10],str[80],st[10],ch,c,chr[10],yo[80][80],td_ops[100][33],addresses[100][4];
+    int address=0,line=0,length,x=0,first_address=0,last_address=0,pa=0,obj_code=0,i=0,j=0,k=0,pos1=0,
     pos2=0,flag1=0,flag2=0,p1=0,p2=0,l=0,z=0,n=0,count=0,l1=0,l2=0;
 
     char op_mnemonic[26][10]={"LDAC","STAC","SUBJ","MULT","STRL","DIVD","ADDA","STRCH","DT",
@@ -233,25 +233,6 @@ int main()
     /*Generating Object File*/
 
     fpr=fopen("intermediate.txt","r");
-
-
-    fscanf(fpr,"%d%s%s%s%s",&line,&program_name,&mnemonic,&operand,&opcode);
-    k=count=0;
-
-    while(strcmp(mnemonic,"END")!=0)
-    {
-        fscanf(fpr,"%d%X%s%s%s%s",&line,&address,&label,&mnemonic,&operand,&opcode);
-        if(strcmp(opcode,"--")!=0)
-        {
-            l1=strlen(opcode)/2;
-            count+=l1;
-            strcpy(opcodes[k],opcode);
-            k++;
-        }
-    }
-    fclose(fpr);
-
-    fpr=fopen("intermediate.txt","r");
     fscanf(fpr,"%d%s%s%s%s",&line,&program_name,&mnemonic,&operand,&opcode);
     k=count=0;
     fpw=fopen("object_file.txt","w");
@@ -302,6 +283,52 @@ int main()
     fprintf(fpw,"E ^ %.6X",first_address);
 
     fclose(fpw);
+    fclose(fpr);
+
+    /*Splitting opcodes in strings of length = 2*/
+
+    fpr=fopen("intermediate.txt","r");
+
+    fscanf(fpr,"%d%s%s%s%s",&line,&program_name,&mnemonic,&operand,&opcode);
+    k=count=i=0;
+
+    while(strcmp(mnemonic,"END")!=0)
+    {
+        fscanf(fpr,"%d%X%s%s%s%s",&line,&address,&label,&mnemonic,&operand,&opcode);
+
+        if(strcmp(opcode,"--")!=0 && strlen(opcode)==6)
+        {
+            if(address-pa>500)
+            {
+                ch=(pa%16)+48;
+                opcodes[k][0]='+';
+                opcodes[k][1]='+';
+                opcodes[k][2]='\0';
+                k++;
+                opcodes[k][0]='0';
+                opcodes[k][1]=ch;
+                opcodes[k][2]='\0';
+                k++;
+            }
+            for(i=0;i<6;)
+            {
+                opcodes[k][0]=opcode[i];i++;
+                opcodes[k][1]=opcode[i];
+                opcodes[k][2]='\0';i++;
+                k++;
+            }
+        }
+        if(strcmp(opcode,"--")==0)
+        {
+            /*fscanf(fpr,"%d%X%s%s%s%s",&line,&address,&label,&mnemonic,&operand,&opcode);*/
+        }
+        if(strcmp(opcode,"--")!=0 && strlen(opcode)==2)
+        {
+            strcpy(opcodes[k],opcode);
+            k++;
+        }
+        pa=address;
+    }
     fclose(fpr);
 
     return 0;
